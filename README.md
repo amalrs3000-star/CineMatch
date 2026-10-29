@@ -2,6 +2,8 @@
 
 # 🎬 CineMatch
 
+### 🚀 [Open the live app](https://cinematch-b4ntaepdo9mqblv2mvvpth.streamlit.app/)
+
 ### Less scrolling. More “that looks good.”
 
 Pick a movie you love. Find films with a similar vibe. Then wander through what’s trending, popular, and playing now.
