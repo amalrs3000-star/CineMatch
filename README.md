@@ -101,6 +101,23 @@ The updater can run while the app is closed. Your laptop must be awake and onlin
 
 After an update, refresh the browser page to load the newest catalogue and model.
 
+## ☁️ Deploy a shareable version
+
+You can deploy the public GitHub repository with [Streamlit Community Cloud](https://share.streamlit.io/):
+
+1. Connect the GitHub account that owns this repository.
+2. Create an app from the CineMatch repository, branch `main`, and entrypoint `app.py`.
+3. In the app's **Advanced settings → Secrets**, add one credential in TOML format:
+
+   ```toml
+   TMDB_API_KEY = "your_v3_api_key"
+   ```
+
+   Or use `TMDB_READ_ACCESS_TOKEN` instead. Never paste a real credential into GitHub.
+4. Deploy. On first launch, CineMatch builds its catalogue and model in the app environment; it does not need the local `data/` folder committed to GitHub.
+
+The live Trending, Popular, and Now Playing tabs fetch TMDB data when the app reruns (cached for 30 minutes). Your Windows Task Scheduler updates your laptop's local catalogue only; it does not run inside the deployed app.
+
 ## 🗂️ Project files
 
 ```text

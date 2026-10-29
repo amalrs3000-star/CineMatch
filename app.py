@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import sqlite3
 import os
+import sqlite3
 from pathlib import Path
 
 import joblib
@@ -20,6 +20,22 @@ PLACEHOLDER = "https://placehold.co/500x750/171717/FFFFFF?text=Poster+Unavailabl
 
 st.set_page_config(page_title="CineMatch", page_icon="🎬", layout="wide")
 load_dotenv(ROOT / ".env")
+
+
+def load_hosted_credentials() -> None:
+    """Read Community Cloud secrets without requiring a committed .env file."""
+    for name in ("TMDB_API_KEY", "TMDB_READ_ACCESS_TOKEN"):
+        if os.getenv(name):
+            continue
+        try:
+            value = st.secrets.get(name)
+        except Exception:
+            value = None
+        if value:
+            os.environ[name] = str(value)
+
+
+load_hosted_credentials()
 
 
 @st.cache_resource
@@ -125,12 +141,27 @@ def render_live_movies(endpoint: str) -> None:
 
 st.title("🎬 CineMatch")
 st.caption("Discover movies and find similar titles from your refreshed catalogue.")
+
+if not DB_PATH.exists() or not MODEL_PATH.exists():
+    if not os.getenv("TMDB_API_KEY") and not os.getenv("TMDB_READ_ACCESS_TOKEN"):
+        st.info("The catalogue is not built yet. Add a TMDB credential in the app's Secrets settings to create it.")
+        st.stop()
+
+    try:
+        with st.spinner("Building CineMatch's movie catalogue and recommendation model for the first time…"):
+            from update_movies import update_catalogue
+
+            update_catalogue()
+        st.cache_data.clear()
+        st.cache_resource.clear()
+    except Exception:
+        st.error("CineMatch could not build its first catalogue. Check the TMDB credential and the app logs, then reboot the app.")
+        st.stop()
+
 movies = load_movies(DB_PATH.stat().st_mtime_ns) if DB_PATH.exists() else load_movies(0)
 
 if movies.empty or not MODEL_PATH.exists():
-    st.info("The movie catalogue and recommendation model are not ready yet.")
-    st.write("Set up your TMDB key, then run the daily update once to collect movies and build the first model.")
-    st.code("python update_movies.py")
+    st.error("The catalogue or recommendation model could not be loaded. Check the app logs and try rebooting CineMatch.")
     st.stop()
 
 recommend_tab, trending_tab, popular_tab, playing_tab = st.tabs(
