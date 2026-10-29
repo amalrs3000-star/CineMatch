@@ -8,7 +8,7 @@
 
 Pick a movie you love. Find films with a similar vibe. Then wander through what’s trending, popular, and playing now.
 
-**A local movie-discovery app powered by TMDB, SQLite, and text-based similarity.**
+**A movie-discovery app built with Streamlit, TMDB, SQLite, and text-based similarity.**
 
 </div>
 
